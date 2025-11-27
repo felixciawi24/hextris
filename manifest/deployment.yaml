@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hextris-app
+  labels:
+    app: hextris-app
+  namespace: exam
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hextris-app
+  template:
+    metadata:
+      labels:
+        app: hextris-app
+    spec:
+      containers:
+      - name: ct-app
+        image: felixciawi/hextris:v1.0
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hextris-app
+  labels:
+    app: hextris-app
+  namespace: exam
+spec:
+  type: ClusterIP
+  selector:
+    app: hextris-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: hextris-app
+  namespace: exam
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - 'kube04-exam.enseval.com'
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: hextris-app
+  namespace: exam
+spec:
+  hosts:
+    - "kube04-exam.enseval.com"
+  gateways:
+    - hextris-app
+  http:
+    - route:
+        - destination:
+            host: hextris-app
+            port:
+              number: 80
