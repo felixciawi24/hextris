@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Pull SCM') {
             steps {
-                git branch: 'main', url: 'hhttps://github.com/felixciawi24/hextris.git'
+                git branch: 'main', url: 'https://github.com/felixciawi24/hextris.git'
             }
         }
         
